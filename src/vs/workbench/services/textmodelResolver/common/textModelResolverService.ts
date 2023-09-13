@@ -104,7 +104,7 @@ class ResourceModelCollection extends ReferenceCollection<Promise<IResolvedTextE
 
 		// untitled and inMemory are bound to a different lifecycle
 		const resource = URI.parse(key);
-		if (resource.scheme === Schemas.untitled || resource.scheme === Schemas.inMemory) {
+		if (resource.scheme === Schemas.inMemory) {
 			return;
 		}
 

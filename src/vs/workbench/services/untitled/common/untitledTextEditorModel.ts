@@ -279,10 +279,10 @@ export class UntitledTextEditorModel extends BaseTextEditorModel implements IUnt
 		// Emit as event
 		this._onDidRevert.fire();
 
-		// A reverted untitled model is invalid because it has
-		// no actual source on disk to revert to. As such we
-		// dispose the model.
-		this.dispose();
+		// // A reverted untitled model is invalid because it has
+		// // no actual source on disk to revert to. As such we
+		// // dispose the model.
+		// this.dispose();
 	}
 
 	async backup(token: CancellationToken): Promise<IWorkingCopyBackup> {
