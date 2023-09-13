@@ -9,7 +9,7 @@ import { Disposable, toDisposable } from 'vs/base/common/lifecycle';
 import { IVoiceRecognitionService } from 'vs/platform/voiceRecognition/node/voiceRecognitionService';
 import { ILogService } from 'vs/platform/log/common/log';
 import { CancellationToken, CancellationTokenSource } from 'vs/base/common/cancellation';
-import { LimitedQueue } from 'vs/base/common/async';
+import { Queue } from 'vs/base/common/async';
 
 export class VoiceTranscriptionManager extends Disposable {
 
@@ -34,9 +34,7 @@ class VoiceTranscriber extends Disposable {
 
 	private static MAX_DATA_LENGTH = 30 /* seconds */ * 16000 /* sampling rate */ * 16 /* bith depth */ * 1 /* channels */ / 8;
 
-	private readonly transcriptionQueue = new LimitedQueue();
-
-	private data: Float32Array | undefined = undefined;
+	private readonly transcriptionQueue = new Queue();
 
 	constructor(
 		private readonly port: MessagePortMain,
@@ -80,25 +78,18 @@ class VoiceTranscriber extends Disposable {
 			}
 		}
 
-		const dataCandidate = this.joinFloat32Arrays(this.data ? [this.data, ...newData] : newData);
+		const dataCandidate = this.joinFloat32Arrays(newData);
 
 		if (dataCandidate.length > VoiceTranscriber.MAX_DATA_LENGTH) {
 			this.logService.warn(`[voice] transcriber: refusing to accept more than 30s of audio data`);
 			return;
 		}
 
-		this.data = dataCandidate;
-
-		this.transcriptionQueue.queue(() => this.transcribe(cancellation));
+		this.transcriptionQueue.queue(() => this.transcribe(dataCandidate, cancellation));
 	}
 
-	private async transcribe(cancellation: CancellationToken): Promise<void> {
+	private async transcribe(data: Float32Array, cancellation: CancellationToken): Promise<void> {
 		if (cancellation.isCancellationRequested) {
-			return;
-		}
-
-		const data = this.data?.slice(0);
-		if (!data) {
 			return;
 		}
 

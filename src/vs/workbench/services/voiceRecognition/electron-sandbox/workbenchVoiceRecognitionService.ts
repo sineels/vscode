@@ -92,7 +92,7 @@ export class WorkbenchVoiceRecognitionService implements IWorkbenchVoiceRecognit
 	private static readonly AUDIO_BIT_DEPTH = 16;
 	private static readonly AUDIO_CHANNELS = 1;
 
-	private static readonly BUFFER_TIMESPAN = 1000;
+	private static readonly BUFFER_TIMESPAN = 3000;
 
 	constructor(
 		@IProgressService private readonly progressService: IProgressService,

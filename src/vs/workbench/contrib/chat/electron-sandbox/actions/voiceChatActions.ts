@@ -273,28 +273,37 @@ class VoiceChatSessions {
 	}
 
 	private registerTranscriptionListener(session: ActiveVoiceChatSession, onDidTranscribe: Event<string>) {
-		let lastText: string | undefined = undefined;
-		let lastTextSimilarCount = 0;
+		let lastText = '';
+		// let lastTextSimilarCount = 0;
 
 		session.disposables.add(onDidTranscribe(text => {
-			if (!text && lastText) {
-				text = lastText;
+			if (!text) {
+				console.log('voice: no text');
+			} else {
+				console.log('voice: got text - ', text);
+				lastText += text;
+
+				session.controller.updateInput(lastText);
 			}
 
-			if (text) {
-				if (lastText && this.isSimilarTranscription(text, lastText)) {
-					lastTextSimilarCount++;
-				} else {
-					lastTextSimilarCount = 0;
-					lastText = text;
-				}
+			// if (!text && lastText) {
+			// 	text = lastText;
+			// }
 
-				if (lastTextSimilarCount >= 2) {
-					session.controller.acceptInput();
-				} else {
-					session.controller.updateInput(text);
-				}
-			}
+			// if (text) {
+			// 	if (lastText && this.isSimilarTranscription(text, lastText)) {
+			// 		lastTextSimilarCount++;
+			// 	} else {
+			// 		lastTextSimilarCount = 0;
+			// 		lastText = text;
+			// 	}
+
+			// 	if (lastTextSimilarCount >= 2) {
+			// 		session.controller.acceptInput();
+			// 	} else {
+			// 		session.controller.updateInput(text);
+			// 	}
+			// }
 		}));
 	}
 
